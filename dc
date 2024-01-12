@@ -1,0 +1,45 @@
+#!/bin/bash
+trap "exit" 0
+# export EXTERNAL_IP=$(hostname -I | awk '{print $1}')
+PHP_USER="webuser"
+
+if [ $# -eq 0 ]; then
+    docker compose ps -a
+    
+elif [ $1 == "up" ]; then
+    docker compose up -d
+    
+elif [ $1 == "php" ]; then
+    if [ $# -gt 1 ]; then
+        docker compose exec php su $PHP_USER -c "${*:2}"
+    else
+        docker compose exec php su $PHP_USER
+    fi
+    
+elif [ $1 == "tinker" ]; then
+    docker compose exec php su $PHP_USER -c 'php artisan tinker'
+    
+elif [ $1 == "a" ]; then
+    docker compose exec php su $PHP_USER -c "php artisan ${*:2}"
+    
+elif [ $1 == "c" ]; then
+    docker compose exec php su $PHP_USER -c "composer ${*:2}"
+    
+elif [ $1 == "ci" ]; then
+    docker compose exec php su $PHP_USER -c 'composer install'
+    
+elif [ $1 == "mysql" ]; then
+    docker compose exec php su $PHP_USER -c 'mysql -h db -u laravel -psecret laravel'
+    
+elif [ $1 == "link" ]; then
+    docker compose exec php su $PHP_USER -c 'cd public; ln -s ../storage/app/public storage'
+    
+elif [ $1 == "recreate" ]; then
+    docker compose up -d --force-recreate ${*:2}
+    
+elif [ $1 == "build" ]; then
+    docker compose up -d --force-recreate --build ${*:2}
+    
+else
+    docker compose $*
+fi
