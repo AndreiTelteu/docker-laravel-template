@@ -31,7 +31,7 @@
 ./dc mysql
 
 # import mysql dump
-./dc exec -T php sh -c 'mysql -h db -u laravel -psecret laravel' < dump-file_name.sql
+./dc exec -T db "mysql -h db -u laravel -psecret laravel" < dump-file_name.sql
 
 # make storage link
 ./dc link
